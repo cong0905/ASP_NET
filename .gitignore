@@ -29,3 +29,7 @@ app_data/
 ## OS generated
 .DS_Store
 Thumbs.db
+
+## Graphify output
+graphify-out/
+.graphify_*.json
