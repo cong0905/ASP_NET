@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  shopnet-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: shopnet-api
+    ports:
+      - "5000:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Data Source=/app/data/shopnet.db
+    volumes:
+      - shopnet-data:/app/data
+    restart: unless-stopped
+
+volumes:
+  shopnet-data:
