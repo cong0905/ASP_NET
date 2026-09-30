@@ -48,4 +48,26 @@ public class AuthController : ApiControllerBase
         var result = await Mediator.Send(new GetCurrentUserQuery());
         return HandleResult(result);
     }
+
+    [HttpPut("profile")]
+    [Authorize]
+    [ProducesResponseType(typeof(Result<UserDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(Result<UserDto>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<ActionResult> UpdateProfile([FromBody] UpdateProfileCommand command)
+    {
+        var result = await Mediator.Send(command);
+        return HandleResult(result);
+    }
+
+    [HttpPost("change-password")]
+    [Authorize]
+    [ProducesResponseType(typeof(Result<bool>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(Result<bool>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<ActionResult> ChangePassword([FromBody] ChangePasswordCommand command)
+    {
+        var result = await Mediator.Send(command);
+        return HandleResult(result);
+    }
 }

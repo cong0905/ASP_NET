@@ -69,4 +69,27 @@ public class ProductsController : ApiControllerBase
         var result = await Mediator.Send(new DeleteProductCommand(id));
         return HandleResult(result);
     }
+
+    [HttpPost("{id:int}/reviews")]
+    [Authorize]
+    [ProducesResponseType(typeof(Result<ReviewDto>), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(Result<ReviewDto>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<ActionResult> AddReview(int id, [FromBody] AddReviewRequest request)
+    {
+        var command = new AddReviewCommand(id, request.Rating, request.Comment);
+        var result = await Mediator.Send(command);
+        return HandleResult(result);
+    }
+
+    [HttpGet("{id:int}/reviews")]
+    [AllowAnonymous]
+    [ProducesResponseType(typeof(Result<List<ReviewDto>>), StatusCodes.Status200OK)]
+    public async Task<ActionResult> GetReviews(int id)
+    {
+        var result = await Mediator.Send(new GetProductReviewsQuery(id));
+        return HandleResult(result);
+    }
 }
+
+public record AddReviewRequest(int Rating, string Comment);

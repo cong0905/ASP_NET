@@ -26,7 +26,7 @@ public class DbInitializer
     {
         try
         {
-            await _context.Database.EnsureCreatedAsync();
+            await _context.Database.MigrateAsync();
             await SeedDataAsync();
         }
         catch (Exception ex)
@@ -183,6 +183,38 @@ public class DbInitializer
 
             _context.Products.AddRange(products);
             await _context.SaveChangesAsync();
+        }
+
+        // 4. Seed Sample Reviews
+        if (!await _context.ProductReviews.AnyAsync())
+        {
+            var customer = await _context.Users.FirstOrDefaultAsync(u => u.Email == "customer@shopnet.com");
+            var macbook = await _context.Products.FirstOrDefaultAsync(p => p.SKU == "APL-MBP14-M3P");
+            var sony = await _context.Products.FirstOrDefaultAsync(p => p.SKU == "SNY-WH1000XM5");
+
+            if (customer != null && macbook != null && sony != null)
+            {
+                var reviews = new List<ProductReview>
+                {
+                    new()
+                    {
+                        ProductId = macbook.Id,
+                        UserId = customer.Id,
+                        Rating = 5,
+                        Comment = "Máy dùng cực kỳ mượt mà, màn hình 120Hz Liquid Retina quá đẹp! Pin trâu dùng cả ngày không hết."
+                    },
+                    new()
+                    {
+                        ProductId = sony.Id,
+                        UserId = customer.Id,
+                        Rating = 5,
+                        Comment = "Chống ồn đỉnh cao, đeo êm tai không bị cấn, chất âm bass sâu và ấm."
+                    }
+                };
+
+                _context.ProductReviews.AddRange(reviews);
+                await _context.SaveChangesAsync();
+            }
         }
     }
 }

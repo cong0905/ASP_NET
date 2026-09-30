@@ -25,6 +25,9 @@ public record ProductDetailDto(
     bool IsActive,
     int CategoryId,
     string CategoryName,
+    double AverageRating,
+    int ReviewCount,
+    List<ReviewDto> Reviews,
     DateTime CreatedAt,
     DateTime? UpdatedAt
 );

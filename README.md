@@ -207,13 +207,15 @@ dotnet run --project src/ShopNet.API/ShopNet.API.csproj
 
 ## 📡 Danh sách API Endpoints
 
-### 🔐 Xác thực (Authentication)
+### 🔐 Xác thực & Người dùng (Auth & Users)
 | Method | Endpoint | Quyền hạn | Mô tả |
 | :--- | :--- | :--- | :--- |
 | `POST` | `/api/auth/register` | Công khai | Đăng ký tài khoản khách hàng mới |
 | `POST` | `/api/auth/login` | Công khai | Đăng nhập nhận JWT Access & Refresh Token |
 | `POST` | `/api/auth/refresh-token` | Công khai | Cấp mới Access Token khi token cũ hết hạn |
 | `GET` | `/api/auth/me` | Đã đăng nhập | Xem thông tin tài khoản hiện tại |
+| `PUT` | `/api/auth/profile` | Đã đăng nhập | Cập nhật thông tin cá nhân (Họ tên, SĐT, Địa chỉ) |
+| `POST` | `/api/auth/change-password` | Đã đăng nhập | Đổi mật khẩu với kiểm tra mật khẩu cũ |
 
 ### 🏷️ Danh mục sản phẩm (Categories)
 | Method | Endpoint | Quyền hạn | Mô tả |
@@ -221,14 +223,16 @@ dotnet run --project src/ShopNet.API/ShopNet.API.csproj
 | `GET` | `/api/categories` | Công khai | Lấy danh sách danh mục và số lượng sản phẩm |
 | `POST` | `/api/categories` | **Admin** | Tạo danh mục mới |
 
-### 📦 Sản phẩm (Products)
+### 📦 Sản phẩm & Đánh giá (Products & Reviews)
 | Method | Endpoint | Quyền hạn | Mô tả |
 | :--- | :--- | :--- | :--- |
 | `GET` | `/api/products` | Công khai | Lấy danh sách sản phẩm (tìm kiếm, lọc giá, phân trang) |
-| `GET` | `/api/products/{id}` | Công khai | Xem chi tiết 1 sản phẩm |
+| `GET` | `/api/products/{id}` | Công khai | Xem chi tiết sản phẩm kèm rating trung bình & reviews |
 | `POST` | `/api/products` | **Admin** | Thêm sản phẩm mới |
 | `PUT` | `/api/products/{id}` | **Admin** | Cập nhật thông tin sản phẩm |
 | `DELETE` | `/api/products/{id}` | **Admin** | Xóa mềm sản phẩm (Soft Delete) |
+| `POST` | `/api/products/{id}/reviews` | Đã đăng nhập | Đánh giá 1-5 sao kèm bình luận cho sản phẩm |
+| `GET` | `/api/products/{id}/reviews` | Công khai | Lấy danh sách đánh giá của sản phẩm |
 
 ### 🛒 Giỏ hàng (Cart)
 | Method | Endpoint | Quyền hạn | Mô tả |
@@ -238,13 +242,20 @@ dotnet run --project src/ShopNet.API/ShopNet.API.csproj
 | `PUT` | `/api/cart/items` | Đã đăng nhập | Cập nhật số lượng sản phẩm trong giỏ |
 | `DELETE` | `/api/cart/items/{productId}` | Đã đăng nhập | Xóa sản phẩm khỏi giỏ |
 
-### 💳 Đơn hàng (Orders)
+### 💳 Đơn hàng & Thanh toán (Orders & Payments)
 | Method | Endpoint | Quyền hạn | Mô tả |
 | :--- | :--- | :--- | :--- |
 | `POST` | `/api/orders/checkout` | Đã đăng nhập | Đặt hàng từ giỏ (tự trừ kho & xóa giỏ) |
 | `GET` | `/api/orders` | Đã đăng nhập | Xem lịch sử đơn hàng (Admin xem tất cả) |
 | `GET` | `/api/orders/{id}` | Đã đăng nhập | Xem chi tiết đơn hàng |
 | `PATCH` | `/api/orders/{id}/status` | **Admin** | Cập nhật trạng thái đơn hàng |
+| `POST` | `/api/orders/{id}/cancel` | Đã đăng nhập | Hủy đơn hàng và tự động hoàn trả số lượng vào kho |
+| `POST` | `/api/orders/{id}/pay` | Đã đăng nhập | Thanh toán mô phỏng (VNPay/CreditCard/COD) |
+
+### 📊 Quản trị & Báo cáo (Admin Dashboard)
+| Method | Endpoint | Quyền hạn | Mô tả |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/api/admin/dashboard` | **Admin** | Thống kê doanh thu, tổng đơn, top sản phẩm bán chạy, cảnh báo hết hàng |
 
 ---
 

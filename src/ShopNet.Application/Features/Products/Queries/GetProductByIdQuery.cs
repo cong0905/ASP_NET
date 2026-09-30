@@ -22,6 +22,8 @@ public class GetProductByIdQueryHandler : IRequestHandler<GetProductByIdQuery, R
     {
         var product = await _context.Products
             .Include(p => p.Category)
+            .Include(p => p.Reviews)
+                .ThenInclude(r => r.User)
             .AsNoTracking()
             .FirstOrDefaultAsync(p => p.Id == request.Id && !p.IsDeleted, cancellationToken);
 
@@ -29,6 +31,18 @@ public class GetProductByIdQueryHandler : IRequestHandler<GetProductByIdQuery, R
         {
             throw new NotFoundException("Product", request.Id);
         }
+
+        var reviews = product.Reviews.Select(r => new ReviewDto(
+            r.Id,
+            r.ProductId,
+            r.UserId,
+            r.User?.FullName ?? "Ẩn danh",
+            r.Rating,
+            r.Comment,
+            r.CreatedAt
+        )).OrderByDescending(r => r.CreatedAt).ToList();
+
+        var avgRating = reviews.Any() ? Math.Round(reviews.Average(r => r.Rating), 1) : 0;
 
         var dto = new ProductDetailDto(
             product.Id,
@@ -41,6 +55,9 @@ public class GetProductByIdQueryHandler : IRequestHandler<GetProductByIdQuery, R
             product.IsActive,
             product.CategoryId,
             product.Category?.Name ?? string.Empty,
+            avgRating,
+            reviews.Count,
+            reviews,
             product.CreatedAt,
             product.UpdatedAt
         );

@@ -24,6 +24,7 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
     public DbSet<CartItem> CartItems => Set<CartItem>();
     public DbSet<Order> Orders => Set<Order>();
     public DbSet<OrderItem> OrderItems => Set<OrderItem>();
+    public DbSet<ProductReview> ProductReviews => Set<ProductReview>();
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -123,6 +124,22 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
                 .WithMany(p => p.OrderItems)
                 .HasForeignKey(oi => oi.ProductId)
                 .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        // ProductReview
+        modelBuilder.Entity<ProductReview>(entity =>
+        {
+            entity.Property(pr => pr.Comment).HasMaxLength(1000).IsRequired();
+
+            entity.HasOne(pr => pr.Product)
+                .WithMany(p => p.Reviews)
+                .HasForeignKey(pr => pr.ProductId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(pr => pr.User)
+                .WithMany(u => u.Reviews)
+                .HasForeignKey(pr => pr.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
     }
 }

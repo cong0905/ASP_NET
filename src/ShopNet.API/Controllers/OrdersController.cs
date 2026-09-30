@@ -51,4 +51,26 @@ public class OrdersController : ApiControllerBase
         var result = await Mediator.Send(new UpdateOrderStatusCommand(id, newStatus));
         return HandleResult(result);
     }
+
+    [HttpPost("{id:int}/cancel")]
+    [Authorize]
+    [ProducesResponseType(typeof(Result<OrderDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(Result<OrderDto>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<ActionResult> CancelOrder(int id, [FromBody] string? reason = null)
+    {
+        var result = await Mediator.Send(new CancelOrderCommand(id, reason));
+        return HandleResult(result);
+    }
+
+    [HttpPost("{id:int}/pay")]
+    [Authorize]
+    [ProducesResponseType(typeof(Result<OrderDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(Result<OrderDto>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<ActionResult> PayOrder(int id, [FromBody] PaymentMethod paymentMethod = PaymentMethod.VNPay_Mock)
+    {
+        var result = await Mediator.Send(new ProcessPaymentCommand(id, paymentMethod));
+        return HandleResult(result);
+    }
 }
