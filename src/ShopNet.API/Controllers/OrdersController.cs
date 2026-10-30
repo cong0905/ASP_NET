@@ -68,7 +68,7 @@ public class OrdersController : ApiControllerBase
     [ProducesResponseType(typeof(Result<OrderDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(Result<OrderDto>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<ActionResult> PayOrder(int id, [FromBody] PaymentMethod paymentMethod = PaymentMethod.VNPay_Mock)
+    public async Task<ActionResult> PayOrder(int id, [FromBody] PaymentMethod paymentMethod = PaymentMethod.VNPay)
     {
         var result = await Mediator.Send(new ProcessPaymentCommand(id, paymentMethod));
         return HandleResult(result);

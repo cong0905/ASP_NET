@@ -98,7 +98,7 @@ public class CancelOrderCommandHandler : IRequestHandler<CancelOrderCommand, Res
 
 public record ProcessPaymentCommand(
     int OrderId,
-    PaymentMethod PaymentMethod = PaymentMethod.VNPay_Mock,
+    PaymentMethod PaymentMethod = PaymentMethod.VNPay,
     string? TransactionRef = null
 ) : IRequest<Result<OrderDto>>;
 

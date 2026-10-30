@@ -25,6 +25,7 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
     public DbSet<Order> Orders => Set<Order>();
     public DbSet<OrderItem> OrderItems => Set<OrderItem>();
     public DbSet<ProductReview> ProductReviews => Set<ProductReview>();
+    public DbSet<PaymentTransaction> PaymentTransactions => Set<PaymentTransaction>();
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -139,6 +140,21 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.HasOne(pr => pr.User)
                 .WithMany(u => u.Reviews)
                 .HasForeignKey(pr => pr.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // PaymentTransaction
+        modelBuilder.Entity<PaymentTransaction>(entity =>
+        {
+            entity.Property(pt => pt.Amount).HasPrecision(18, 2);
+            entity.Property(pt => pt.TransactionId).HasMaxLength(100).IsRequired();
+            entity.Property(pt => pt.GatewayTransactionNo).HasMaxLength(100);
+            entity.Property(pt => pt.ResponseCode).HasMaxLength(50);
+            entity.Property(pt => pt.Message).HasMaxLength(500);
+
+            entity.HasOne(pt => pt.Order)
+                .WithMany()
+                .HasForeignKey(pt => pt.OrderId)
                 .OnDelete(DeleteBehavior.Cascade);
         });
     }

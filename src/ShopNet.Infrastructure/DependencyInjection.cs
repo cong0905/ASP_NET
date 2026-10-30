@@ -8,6 +8,7 @@ using ShopNet.Application.Common.Interfaces;
 using ShopNet.Infrastructure.Persistence;
 using ShopNet.Infrastructure.Persistence.Interceptors;
 using ShopNet.Infrastructure.Services;
+using ShopNet.Infrastructure.Services.Payment;
 
 namespace ShopNet.Infrastructure;
 
@@ -18,13 +19,23 @@ public static class DependencyInjection
         // 1. Audit Interceptor
         services.AddScoped<AuditableEntitySaveChangesInterceptor>();
 
-        // 2. DbContext with SQLite
+        // 2. DbContext (Supports SQL Server or SQLite based on configuration)
+        var dbProvider = configuration["DatabaseProvider"] ?? "Sqlite";
         var connectionString = configuration.GetConnectionString("DefaultConnection") ?? "Data Source=shopnet.db";
+
         services.AddDbContext<ApplicationDbContext>((sp, options) =>
         {
             var interceptor = sp.GetRequiredService<AuditableEntitySaveChangesInterceptor>();
-            options.UseSqlite(connectionString)
-                   .AddInterceptors(interceptor);
+            if (dbProvider.Equals("SqlServer", StringComparison.OrdinalIgnoreCase))
+            {
+                options.UseSqlServer(connectionString)
+                       .AddInterceptors(interceptor);
+            }
+            else
+            {
+                options.UseSqlite(connectionString)
+                       .AddInterceptors(interceptor);
+            }
         });
 
         services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
@@ -35,6 +46,10 @@ public static class DependencyInjection
         services.AddScoped<ICurrentUserService, CurrentUserService>();
         services.AddSingleton<IPasswordHasher, PasswordHasher>();
         services.AddSingleton<IJwtTokenService, JwtTokenService>();
+
+        // Payment Services
+        services.AddHttpClient<IMoMoService, MoMoService>();
+        services.AddScoped<IVnPayService, VnPayService>();
 
         // 4. JWT Authentication
         var secretKey = configuration["Jwt:Key"] ?? "super_secret_shopnet_dev_key_which_is_very_long_and_secure_2026";
